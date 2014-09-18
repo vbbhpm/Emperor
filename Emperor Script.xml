@@ -1,3 +1,381 @@
 <Profile>
-  <Name>Example Profile that does nothing...</Name>
+  <Name>Emperor</Name>
+  <KillMonsters>True</KillMonsters>
+  <PickupLoot>True</PickupLoot>
+  <GameParams act="OpenWorld" resumeFromSave="False" isPrivate="True" numGames="-1" />
+
+  <!-- +Rep to 
+        DyingHymn, NoWayLol, Dildozer, Derrek, Sychotix, Nesox
+  -->
+
+  <TargetBlacklists>
+    <TargetBlacklist actorId="114622" name="Tyrael" />
+  </TargetBlacklists>
+
+  <Order>
+    <ToggleTargeting questId="1"  combat="True" looting="True" lootRadius="100" killRadius="80" />
+
+    <If condition="not (Me.IsInTown) and not (
+        CurrentWorldId == 288454 or 
+        CurrentWorldId == 288685 or 
+        CurrentWorldId == 288687 or 
+        CurrentWorldId == 288798 or 
+        CurrentWorldId == 288800 or 
+        CurrentWorldId == 288802 or 
+        CurrentWorldId == 288804 or 
+        CurrentWorldId == 288810 or 
+        CurrentWorldId == 288814 or 
+        CurrentWorldId == 288816 or 
+        CurrentLevelAreaId == 405915)">
+      <LogMessage output="Not in Town and Not in Rift, using TownPortal" />
+      <TownPortal questId="1" />
+    </If>
+
+    <!-- Waypoint to A5 Hub if in town but not A5 Hub-->
+    <While condition="Me.IsInTown and CurrentLevelAreaId != 270011">
+      <LogMessage output="Using Waypoint to Act 5 Hub" />
+      <UseWaypoint questId="312429" stepId="2" waypointNumber="46" name="Waypoint-397" statusText="" />
+    </While>
+
+    <If condition="(IsActiveQuestAndStep(337492,10) or IsActiveQuestAndStep(405695,9)) and Me.IsInTown">
+      <LogMessage output="Talk to Orek" />
+      <MoveToActor questId="337492" stepId="10" x="594" y="764" z="3"  actorId="363744" interactRange="9" name="X1_LR_Nephalem"  pathPrecision="5" pathPointLimit="250" statusText=""
+                   exitWithConversation="True" exitWithVendorWindow="True"/>
+      <MoveToActor questId="405695" stepId="9" x="594" y="764" z="3"  actorId="363744" interactRange="9" name="X1_LR_Nephalem"  pathPrecision="5" pathPointLimit="250" statusText=""
+                   exitWithConversation="True" exitWithVendorWindow="True"/>
+      <WaitTimer questId="1" waitTime="30000" />
+    </If>
+
+    <!-- In Town, Rift Portal Open, Take Return Portal -->
+    <!-- Quest: X1_LR_DungeonFinder (337492) World: X1_Westmarch_Hub (304235) LevelArea: x1_Westm_Hub (270011) -->
+    <If condition="IsActiveQuestAndStep(337492,13) and Me.IsInTown and ActorExistsAt(191492, 545, 753, 3, 50)">
+      <MoveToActor questId="337492" stepId="13" x="545" y="753" z="3"  actorId="191492" interactRange="9" name="hearthPortal"  isPortal="True"
+                   destinationWorldId="-1" pathPrecision="5" pathPointLimit="250" statusText="" />
+    </If>
+
+    <!-- ActorSNO=345935 is the Rift Portal in Town -->
+    <While condition="Me.IsInTown and not (ActorExistsAt(345935, 606, 750, 2, 50)) and not IsActiveQuestAndStep(405695,9) and not IsActiveQuestAndStep(337492,10)">
+      <!-- Clear some backpack space, we're going item huntin' -->
+      <TrinityTownRun minFreeBagSlots="40"/>
+
+      <!-- Waypoint to A5 Hub if in town but not A5 Hub-->
+      <While condition="Me.IsInTown and CurrentLevelAreaId != 270011 and not IsActiveQuestAndStep(405695,9) and not IsActiveQuestAndStep(337492,10)">
+        <LogMessage output="Using Waypoint to Act 5 Hub" />
+        <UseWaypoint questId="312429" stepId="2" waypointNumber="46" name="Waypoint-397" statusText="" />
+      </While>
+
+      <!-- Grab some Keys if needed -->
+      <GetItemFromStash questId="1" greaterRiftKey="True" />
+      <GetItemFromStash questId="1" stackCount="5" actorId="323722" />
+
+      <HasNoRiftKeys>
+        <LogMessage output="No Rift Keys Found! Cannot Rift without some Rift Keys. Run some bounties, yo!" />
+      </HasNoRiftKeys>
+
+      <TownRun questId="1" minFreeBagSlots="59" minDurability="90" />
+      <LogMessage output="Triggering QTOpenRiftWrapper... " />
+      <QTOpenRiftWrapper questId="1" />
+
+    </While>
+
+
+    <!-- Tiered Rifts: Trial -->
+    <!-- LevelArea: p1_TieredRift_Challenge, Id: 405915 -->
+    <While condition="CurrentLevelAreaId == 405915 and IsActiveQuest(405695)">
+      <WaitTimer questId="405695" stepId="13" waitTime="10000" />
+
+      <SafeMoveTo questId="405695" stepId="1" x="280" y="278" z="-11" pathPrecision="5" pathPointLimit="250" statusText="" />
+      <WaitTimer questId="405695" stepId="1" waitTime="10000" />
+
+      <SafeMoveTo questId="405695" stepId="9" x="272" y="256" z="-11" pathPrecision="5" pathPointLimit="250" statusText="" />
+      <MoveToActor questId="405695" stepId="9" actorId="406207" interactRange="9"
+                      name="p1_g_Portal_TieredRiftChallenge-63667"  isPortal="True" destinationWorldId="-1" pathPrecision="5" pathPointLimit="250" statusText="" />
+      <WaitTimer questId="405695" stepId="9" waitTime="1000" />
+    </While>
+
+    <!-- Complete the Greater Rift, Talk to Urshi -->
+    <While condition="CurrentLevelAreaId == 332339 and IsActiveQuestAndStep(405695,9)">
+      <MoveToActor questId="405695" stepId="9" x="392" y="593" z="24"  actorId="363744" interactRange="9"
+                   name="X1_LR_Nephalem-64310"  pathPrecision="5" pathPointLimit="250" statusText="" />
+    </While>
+
+
+    <While condition="Me.IsInTown and IsActiveQuest(337492) and ActorExistsAt(345935, 606, 750, 2, 50) and not IsActiveQuestAndStep(337492,10)">
+      <!-- Enter the Rift -->
+      <LogMessage questId="337492" stepId="1" output="Entering the Rift" />
+      <MoveToActor questId="337492" stepId="1" actorId="345935" interactRange="9" name="X1_OpenWorld_LootRunPortal-1589" x="606" y="750" z="2"
+                   isPortal="True" pathPrecision="5" pathPointLimit="250"/>
+      <MoveToActor questId="337492" stepId="3" actorId="345935" interactRange="9" name="X1_OpenWorld_LootRunPortal-1589" x="606" y="750" z="2"
+                   isPortal="True" pathPrecision="5" pathPointLimit="250"/>
+      <WaitTimer questId="337492" stepId="1" waitTime="500" />
+    </While>
+
+
+    <!--
+      LevelArea: X1_LR_Tileset_Fortress, Id: 333758    
+      LevelArea: X1_LR_Tileset_SpiderCaves, Id: 322727
+      LevelArea: X1_LR_Tileset_CraterTowers, Id: 342477
+      LevelArea: X1_LR_Tileset_RootCave, Id: 276128
+      LevelArea: X1_LR_Tileset_FloodedCave, Id: 276212
+      LevelArea: X1_LR_Tileset_HellPortal, Id: 362179
+      LevelArea: X1_LR_Tileset_ZoltArchives, Id: 312606
+      LevelArea: X1_LR_Tileset_Cathedral, Id: 275923
+      LevelArea: X1_LR_Tileset_Abattoir, Id: 352652
+      LevelArea: X1_LR_Tileset_IceCave, Id: 276230
+      LevelArea: X1_LR_Tileset_WormCaves, Id: 276215
+      LevelArea: X1_LR_Tileset_Crypt, Id: 276150
+      LevelArea: X1_LR_Tileset_Westmarch, Id: 331264
+      -->
+    <While condition="(IsActiveQuestAndStep(337492,1) or IsActiveQuestAndStep(337492,13) or IsActiveQuestAndStep(337492,16) or IsActiveQuestAndStep(337492,3)) and not Me.IsInTown and 
+           (
+           CurrentLevelAreaId == 333758 or 
+           CurrentLevelAreaId == 322727 or 
+           CurrentLevelAreaId == 342477 or 
+           CurrentLevelAreaId == 276128 or
+           CurrentLevelAreaId == 276212 or 
+           CurrentLevelAreaId == 362179 or
+           CurrentLevelAreaId == 312606 or
+           CurrentLevelAreaId == 275923 or
+           CurrentLevelAreaId == 352652 or
+           CurrentLevelAreaId == 276230 or
+           CurrentLevelAreaId == 276215 or
+           CurrentLevelAreaId == 276150 or
+           CurrentLevelAreaId == 331264 
+           )
+           ">
+      <!-- Wait for quest to start-->
+      <LogMessage output="Exploring Tight Map Rift" />
+      <!-- Special Handling for tight maps -->
+      <ExploreDungeon routeMode="WeightedNearestMinimapVisited" questId="337492" stepId="1" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <LogMessage questId="337492" stepId="1" output="Rift Explored" />
+      <ExploreDungeon routeMode="WeightedNearestMinimapVisited" questId="337492" stepId="13" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <LogMessage questId="337492" stepId="13" output="Greater Rift Explored" />
+
+      <If condition="(IsActiveQuestAndStep(337492,1) or IsActiveQuestAndStep(337492,13)) and CurrentWorldId==288454 and CurrentLevelAreaId==332323">
+        <MoveToScene questId="337492" stepId="1" sceneName="AqueductEntranceA" />
+        <MoveToScene questId="337492" stepId="13" sceneName="AqueductEntranceA" />
+      </If>
+
+      <WaitTimer questId="337492" stepId="1" waitTime="1000" />
+      <WaitTimer questId="337492" stepId="13" waitTime="1000" />
+      <!-- Move to the Portal Exit if found and still on Rift Quest -->
+      <MoveToMapMarker questId="337492" stepId="1" isPortal="True" destinationWorldId="-1" />
+      <MoveToMapMarker questId="337492" stepId="13" isPortal="True" destinationWorldId="-1" />
+      <MoveToMapMarker questId="337492" stepId="16" isPortal="True" destinationWorldId="-1" />
+      <WaitTimer questId="1" waitTime="1000" />
+
+      <WaitTimer questId="337492" stepId="3" waitTime="5000" />
+
+
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon questId="337492" stepId="3" routeMode="SceneTSP" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon questId="337492" stepId="16" routeMode="SceneTSP" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45" />
+      <!-- Move to POI if needed -->
+      <MoveToObjective questId="337492" stepId="3" />
+      <MoveToObjective questId="337492" stepId="16" />
+    </While>
+
+
+
+    <While condition="IsActiveQuestAndStep(337492,34) and not Me.IsInTown and (CurrentLevelAreaId != 333758 or CurrentLevelAreaId != 322727)">
+      <!-- Greter Rifts -->
+      <!-- Find Urshi -->
+      <ExploreDungeon questId="337492" stepId="34" routeMode="SceneTSP" until="ObjectFound" ignoreMarkers="True"
+                             objectDistance="75"
+                             actorId="398682" pathPrecision="30" boxSize="15" boxTolerance="0.01" />
+      <!-- Quest: x1_OpenWorld_quest (312429) World: X1_LR_Level_05 (288800) LevelArea: X1_LR_Tileset_HexMaze (352719) -->
+      <LogMessage questId="337492" stepId="34" output="Interacting With Urshi (2)" />
+      <!-- Interact with Urshi -->
+      <MoveToActor questId="337492" stepId="34" actorId="398682" interactRange="9" name="p1_LR_TieredRift_Nephalem-20927"  pathPrecision="5" pathPointLimit="250" statusText=""
+                    exitWithVendorWindow="True" exitWithConversation="True "/>
+      <LogMessage questId="337492" stepId="34" output="Completing Greater Rift (2)" />
+      <CompleteGreaterRift questId="337492" stepId="34" />
+    </While>
+
+
+    <!-- Oasis -->
+    <While condition="CurrentLevelAreaId==332323 and (IsActiveQuestAndStep(337492,1) or IsActiveQuestAndStep(337492,13))">
+      <LogMessage output="In Oasis, using SceneDirection" />
+      <ExploreDungeon questId="337492" stepId="1" routeMode="WeightedNearestMinimapUnvisited" direction="NorthWest" until="RiftComplete"
+                      sceneName="AqueductEntranceA" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30" />
+      <ExploreDungeon questId="337492" stepId="13" routeMode="WeightedNearestMinimapUnvisited" direction="NorthWest" until="RiftComplete"
+                      sceneName="AqueductEntranceA" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30" />
+      <ExploreDungeon questId="337492" stepId="1" routeMode="SceneDirection" direction="NorthWest" until="SceneFound"
+                      sceneName="AqueductEntranceA" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <ExploreDungeon questId="337492" stepId="13" routeMode="SceneDirection" direction="NorthWest" until="SceneFound"
+                      sceneName="AqueductEntranceA" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <MoveToScene questId="337492" stepId="1" sceneName="AqueductEntranceA" />
+      <MoveToScene questId="337492" stepId="13" sceneName="AqueductEntranceA" />
+      <OffsetMove questId="337492" stepId="1" y="-300" />
+      <OffsetMove questId="337492" stepId="13" y="-300" />
+
+      <LogMessage questId="337492" stepId="13" output="Rift Explored" />
+
+      <!-- Move to the Portal Exit if found and still on Rift Quest -->
+      <MoveToMapMarker questId="337492" stepId="1" isPortal="True" destinationWorldId="-1"  />
+      <MoveToMapMarker questId="337492" stepId="13" isPortal="True" destinationWorldId="-1"  />
+
+      <WaitTimer questId="337492" stepId="3" waitTime="1000" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon routeMode="SceneTSP" questId="337492" stepId="3" until="RiftComplete" pathPrecision="30" boxSize="35" boxTolerance="0.01" markerDistance="45" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon questId="337492" stepId="16" routeMode="SceneTSP" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45" />
+      <MoveToMapMarker questId="337492" stepId="16" isPortal="True" destinationWorldId="-1"  />
+      <!-- Move to POI if needed -->
+      <MoveToObjective questId="337492" stepId="3" />
+      <MoveToObjective questId="337492" stepId="16" />
+    </While>
+
+    <!-- LevelArea: X1_LR_Tileset_Exterior_BattlefieldsBridge, Id: 349048 -->
+    <While condition="CurrentLevelAreaId==349048 and (IsActiveQuestAndStep(337492,1) or IsActiveQuestAndStep(337492,13))">
+      <LogMessage output="In Oasis, using SceneDirection" />
+      <ExploreDungeon questId="337492" stepId="1" routeMode="SceneDirection" direction="North" until="SceneFound" 
+                      sceneName="a3_Battlefield_Exit_E01_S02" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <ExploreDungeon questId="337492" stepId="13" routeMode="SceneDirection" direction="North" until="SceneFound"
+                      sceneName="a3_Battlefield_Exit_E01_S02" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+        </PriorityScenes>
+      </ExploreDungeon>
+      <MoveToScene questId="337492" stepId="1" sceneName="a3_Battlefield_Exit_E01_S02" />
+      <MoveToScene questId="337492" stepId="13" sceneName="a3_Battlefield_Exit_E01_S02" />
+      <OffsetMove questId="337492" stepId="1" x="-300" />
+      <OffsetMove questId="337492" stepId="13" x="-300" />
+      <MoveToMapMarker questId="337492" stepId="1" isPortal="True" destinationWorldId="-1"  />
+      <MoveToMapMarker questId="337492" stepId="13" isPortal="True" destinationWorldId="-1"  />
+      <WaitTimer questId="337492" stepId="1" waitTime="1000" />
+      <WaitTimer questId="337492" stepId="13" waitTime="1000" />
+
+      <WaitTimer questId="337492" stepId="3" waitTime="1000" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon routeMode="SceneTSP" questId="337492" stepId="3" until="RiftComplete" pathPrecision="30" boxSize="35" boxTolerance="0.01" markerDistance="45" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon questId="337492" stepId="16" routeMode="SceneTSP" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45" />
+      <MoveToMapMarker questId="337492" stepId="16" isPortal="True" destinationWorldId="-1"  />
+      <!-- Move to POI if needed -->
+      <MoveToObjective questId="337492" stepId="3" />
+      <MoveToObjective questId="337492" stepId="16" />
+    </While>
+
+
+    <!-- Typical world explore -->
+    <While condition="(IsActiveQuestAndStep(337492,1) or IsActiveQuestAndStep(337492,13) or IsActiveQuestAndStep(337492,16) or IsActiveQuestAndStep(337492,3)) 
+           and not Me.IsInTown and (CurrentLevelAreaId != 333758 or CurrentLevelAreaId != 322727) and not 
+           (
+           CurrentLevelAreaId == 333758 or 
+           CurrentLevelAreaId == 322727 or 
+           CurrentLevelAreaId == 342477 or 
+           CurrentLevelAreaId == 276128 or
+           CurrentLevelAreaId == 276212 or 
+           CurrentLevelAreaId == 362179 or
+           CurrentLevelAreaId == 312606 or
+           CurrentLevelAreaId == 275923 or
+           CurrentLevelAreaId == 352652 or
+           CurrentLevelAreaId == 276230 or
+           CurrentLevelAreaId == 276215 or
+           CurrentLevelAreaId == 276150 or
+           CurrentLevelAreaId == 331264 
+           )           
+           ">
+
+      <LogMessage output="Exploring Normal Rift" />
+      <!-- Normal Rifts -->
+      <ExploreDungeon questId="337492" stepId="1" routeMode="WeightedNearestMinimapVisited" until="RiftComplete" pathPrecision="30" boxSize="45" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+
+      <LogMessage questId="337492" stepId="1" output="Rift Explored" />
+
+      <!-- Greater Rifts -->
+      <ExploreDungeon questId="337492" stepId="13" routeMode="WeightedNearestMinimapVisited"
+                             until="RiftComplete" pathPrecision="30" boxSize="40" boxTolerance="0.01" markerDistance="30">
+        <PriorityScenes>
+          <PriorityScene sceneName="Exit" />
+          <PriorityScene sceneName="AqueductEntranceA" />
+        </PriorityScenes>
+      </ExploreDungeon>
+
+      <LogMessage questId="337492" stepId="13" output="Rift Explored" />
+
+      <!-- Move to the Portal Exit if found and still on Rift Quest -->
+      <MoveToMapMarker questId="337492" stepId="1" isPortal="True" destinationWorldId="-1"  />
+      <MoveToMapMarker questId="337492" stepId="13" isPortal="True" destinationWorldId="-1"  />
+      <WaitTimer questId="337492" stepId="1" waitTime="1000" />
+      <WaitTimer questId="337492" stepId="13" waitTime="1000" />
+
+
+      <WaitTimer questId="337492" stepId="3" waitTime="5000" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon routeMode="SceneTSP" questId="337492" stepId="3" until="RiftComplete" pathPrecision="30" boxSize="35" boxTolerance="0.01" markerDistance="45" />
+      <!-- Boss Found, re-explore if needed -->
+      <ExploreDungeon questId="337492" stepId="16" routeMode="SceneTSP" until="RiftComplete" pathPrecision="30" boxSize="15" boxTolerance="0.01" markerDistance="45" />
+      <MoveToMapMarker questId="337492" stepId="16" isPortal="True" destinationWorldId="-1"  />
+      <!-- Move to POI if needed -->
+      <MoveToObjective questId="337492" stepId="3" />
+      <MoveToObjective questId="337492" stepId="16" />
+      <ReloadProfile force="True" />
+    </While>
+
+    <While condition="IsActiveQuestAndStep(337492,34) and not Me.IsInTown and (CurrentLevelAreaId != 333758 or CurrentLevelAreaId != 322727)">
+      <!-- Greter Rifts -->
+      <!-- Find Urshi -->
+      <ExploreDungeon questId="337492" stepId="34" routeMode="NearestUnvisited" until="ObjectFound" ignoreMarkers="True"
+                             objectDistance="75"
+                             actorId="398682" pathPrecision="30" boxSize="15" boxTolerance="0.01" />
+      <!-- Quest: x1_OpenWorld_quest (312429) World: X1_LR_Level_05 (288800) LevelArea: X1_LR_Tileset_HexMaze (352719) -->
+      <LogMessage questId="337492" stepId="34" output="Interacting With Urshi (2)" />
+      <!-- Interact with Urshi -->
+      <MoveToActor questId="337492" stepId="34" actorId="398682" interactRange="9" name="p1_LR_TieredRift_Nephalem-20927"  pathPrecision="5" pathPointLimit="250" statusText=""
+                    exitWithVendorWindow="True" exitWithConversation="True "/>
+      <LogMessage questId="337492" stepId="34" output="Completing Greater Rift (2)" />
+      <CompleteGreaterRift questId="337492" stepId="34" />
+    </While>
+
+    <TrinityTownPortal questId="337492" stepId="10" waitTime="5000" />
+
+    <If condition="Me.IsInTown and not IsActiveQuestAndStep(405695,9)">
+      <ResumeUseTownPortal questId="337492" stepId="1" />
+      <!-- Speak to Orek -->
+      <MoveToActor questId="337492" stepId="10" x="594" y="764" z="3" actorId="363744" interactRange="9" name="X1_LR_Nephalem-21212"  pathPrecision="5" pathPointLimit="250" statusText=""
+                   exitWithConversation="True" exitWithVendorWindow="True"/>
+      <!-- Leave Game Option -->
+      <!--<LeaveGame questId="337492" stepId="-1" reason="Run is done" />-->
+
+      <HasNoRiftKeys>
+        <!-- Wait 30 sec, then re-recreate! -->
+        <WaitTimer questId="1" waitTime="31000" />
+      </HasNoRiftKeys>
+    </If>
+    <LogMessage output="End of Profile, waiting 5 seconds to reload..." />
+    <WaitTimer questId="1" waitTime="5000" />
+    <LoadProfile profile="R-RIFT.xml" />
+  </Order>
 </Profile>
